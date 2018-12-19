@@ -109,7 +109,9 @@ public class FingerprintUiHelper extends FingerprintManager.AuthenticationCallba
             mIcon.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    mCallback.onError();
+                    if (null != mCallback) {
+                        mCallback.onError();
+                    }
                 }
             }, ERROR_TIMEOUT_MILLIS);
         }
@@ -135,7 +137,9 @@ public class FingerprintUiHelper extends FingerprintManager.AuthenticationCallba
         mIcon.postDelayed(new Runnable() {
             @Override
             public void run() {
-                mCallback.onAuthenticated();
+                if (null != mCallback) {
+                    mCallback.onAuthenticated();
+                }
             }
         }, SUCCESS_DELAY_MILLIS);
     }

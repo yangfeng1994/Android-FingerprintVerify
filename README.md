@@ -4,24 +4,20 @@
 一个用于Android手机指纹验证与密码锁验证的项目
 
 #### 软件架构
-软件架构说明
+
+本依赖使用了建造者模式。
 
 
-#### 安装教程
+#### 使用方法
 
-1. xxxx
-2. xxxx
-3. xxxx
-
-#### 使用说明
-
-1. xxxx
-2. xxxx
-3. xxxx
-
-#### 参与贡献
-
-1. Fork 本项目
-2. 新建 Feat_xxx 分支
-3. 提交代码
-4. 新建 Pull Request
+1. 在项目的根目录下的 build.gradle中添加
+ allprojects {
+   		repositories {
+   			...
+   			maven { url 'https://jitpack.io' }
+   		}
+   	}
+2. 在app下的 build.gradle中添加
+dependencies {
+	        implementation 'com.github.yangfeng1994:Android-FingerprintVerify:1.0.1'
+	}
