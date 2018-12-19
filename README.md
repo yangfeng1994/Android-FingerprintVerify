@@ -11,13 +11,18 @@
 #### 使用方法
 
 1. 在项目的根目录下的 build.gradle中添加
- allprojects {
+
+allprojects {
+
    		repositories {
    			...
    			maven { url 'https://jitpack.io' }
-   		}
-   	}
+   		              }
+
+            	}
 2. 在app下的 build.gradle中添加
+
 dependencies {
+
 	        implementation 'com.github.yangfeng1994:Android-FingerprintVerify:1.0.1'
-	}
+	        }
