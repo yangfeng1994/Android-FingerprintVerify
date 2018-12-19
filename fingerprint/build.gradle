@@ -50,7 +50,7 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 }
 
 task classesJar(type: Jar) {
-    from "$buildDir/intermediates/classes/release"
+    from "$buildDir/outputs/aar/fingerprint-release.aar"
 }
 
 artifacts {

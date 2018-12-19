@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/FingerprintVerify.iml" filepath="$PROJECT_DIR$/FingerprintVerify.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Android-FingerprintVerify.iml" filepath="$PROJECT_DIR$/Android-FingerprintVerify.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/fingerprint/fingerprint.iml" filepath="$PROJECT_DIR$/fingerprint/fingerprint.iml" />
     </modules>
