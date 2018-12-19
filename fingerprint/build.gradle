@@ -49,12 +49,12 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     from javadoc.destinationDir
 }
 
-task classesJar(type: Jar) {
-    from "$buildDir/outputs/aar/fingerprint-release.aar"
-}
+//task classesJar(type: Jar) {
+//    from "$buildDir/outputs/aar/fingerprint-release.aar"
+//}
 
 artifacts {
-    archives classesJar
+//    archives classesJar
     archives javadocJar
     archives sourcesJar
 }
