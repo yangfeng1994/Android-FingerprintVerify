@@ -19,6 +19,4 @@ public interface FingerprintBaseCharacter extends BaseCharacter{
 
     boolean initCipher(Cipher cipher, String keyName);
 
-    void onPurchased(boolean withFingerprint,
-                     @Nullable FingerprintManager.CryptoObject cryptoObject);
 }

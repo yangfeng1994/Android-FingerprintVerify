@@ -39,10 +39,8 @@ public class FingerprintCharacter implements FingerprintBaseCharacter, UpdateFin
     private KeyStore keyStore;
     private KeyGenerator keyGenerator;
     private Cipher cipher;
-    public String secretMessage;
-    public String defaultKeyName;
-    public String keyNameNotInvalidated;
-    private String dialogFragmentTag;
+    public String mKeystoreAlias;
+    private String mDialogTag;
     private FingerprintAuthenticatedCallback callback;
 
     public KeyStore getKeyStore() {
@@ -69,43 +67,28 @@ public class FingerprintCharacter implements FingerprintBaseCharacter, UpdateFin
         this.cipher = cipher;
     }
 
-    public String getSecretMessage() {
-        return secretMessage;
+
+    public String getKeystoreAlias() {
+        return mKeystoreAlias;
     }
 
-    public void setSecretMessage(String secretMessage) {
-        this.secretMessage = secretMessage;
+    public void setKeystoreAlias(String keystoreAlias) {
+        this.mKeystoreAlias = keystoreAlias;
     }
 
-    public String getDefaultKeyName() {
-        return defaultKeyName;
+    public String getDialogTag() {
+        return mDialogTag;
     }
 
-    public void setDefaultKeyName(String defaultKeyName) {
-        this.defaultKeyName = defaultKeyName;
+    public void setDialogTag(String dialogTag) {
+        this.mDialogTag = dialogTag;
     }
 
-    public String getKeyNameNotInvalidated() {
-        return keyNameNotInvalidated;
-    }
-
-    public void setKeyNameNotInvalidated(String keyNameNotInvalidated) {
-        this.keyNameNotInvalidated = keyNameNotInvalidated;
-    }
-
-    public String getDialogFragmentTag() {
-        return dialogFragmentTag;
-    }
-
-    public void setDialogFragmentTag(String dialogFragmentTag) {
-        this.dialogFragmentTag = dialogFragmentTag;
-    }
-
-    public FingerprintAuthenticatedCallback getCallback() {
+    public FingerprintAuthenticatedCallback getFingerprintCallback() {
         return callback;
     }
 
-    public void setCallback(FingerprintAuthenticatedCallback callback) {
+    public void setFingerprintCallback(FingerprintAuthenticatedCallback callback) {
         this.callback = callback;
     }
 
@@ -116,7 +99,7 @@ public class FingerprintCharacter implements FingerprintBaseCharacter, UpdateFin
      */
     @Override
     public void show(FragmentManager fragmentManager) {
-        if (initCipher(getCipher(), TextUtils.isEmpty(getDefaultKeyName()) ? getKeyNameNotInvalidated() : getDefaultKeyName())) {
+        if (initCipher(getCipher(), getKeystoreAlias())) {
             FingerprintAuthenticationDialogFragment fragment = FingerprintAuthenticationDialogFragment.newInstance();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 fragment.setCryptoObject(new FingerprintManager.CryptoObject(getCipher()));
@@ -125,7 +108,7 @@ public class FingerprintCharacter implements FingerprintBaseCharacter, UpdateFin
                     FingerprintAuthenticationDialogFragment.Stage.FINGERPRINT);
             fragment.setUpdateFingerprintCallback(this);
             fragment.setCallback(this);
-            fragment.show(fragmentManager, getDialogFragmentTag());
+            fragment.show(fragmentManager, getDialogTag());
         } else {
             FingerprintAuthenticationDialogFragment fragment
                     = new FingerprintAuthenticationDialogFragment();
@@ -136,7 +119,7 @@ public class FingerprintCharacter implements FingerprintBaseCharacter, UpdateFin
                     FingerprintAuthenticationDialogFragment.Stage.NEW_FINGERPRINT_ENROLLED);
             fragment.setUpdateFingerprintCallback(this);
             fragment.setCallback(this);
-            fragment.show(fragmentManager, getDialogFragmentTag());
+            fragment.show(fragmentManager, getDialogTag());
         }
     }
 
@@ -163,8 +146,8 @@ public class FingerprintCharacter implements FingerprintBaseCharacter, UpdateFin
                         KeyProperties.PURPOSE_ENCRYPT |
                                 KeyProperties.PURPOSE_DECRYPT)
                         .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
-                        // Require the user to authenticate with a fingerprint to authorize every use
-                        // of the key
+                        // 要求用户使用指纹进行身份验证以授权每次使用
+                        //钥匙的钥匙
                         .setUserAuthenticationRequired(true)
                         .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -214,48 +197,27 @@ public class FingerprintCharacter implements FingerprintBaseCharacter, UpdateFin
         }
     }
 
-    @Override
-    public void onPurchased(boolean withFingerprint,
-                            @Nullable FingerprintManager.CryptoObject cryptoObject) {
-        if (withFingerprint) {
-            // If the user has authenticated with fingerprint, verify that using cryptography and
-            // then show the confirmation message.
-            assert cryptoObject != null;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                tryEncrypt(cryptoObject.getCipher());
-            }
-        } else {
-            // Authentication happened with backup password. Just show the confirmation message.
-        }
-    }
 
-    private void tryEncrypt(Cipher cipher) {
-        try {
-            byte[] encrypted = cipher.doFinal(getSecretMessage().getBytes());
-        } catch (BadPaddingException | IllegalBlockSizeException e) {
-
-        }
-    }
 
     /**
      * 重新创建密钥后，再次输入密码，以便验证包含新密钥的指纹。
      */
     @Override
     public void onUpdateFingerprintSucceed() {
-        onCreateKey(TextUtils.isEmpty(getDefaultKeyName()) ? getKeyNameNotInvalidated() : getDefaultKeyName(), true);
+        onCreateKey(getKeystoreAlias(), true);
     }
 
     @Override
     public void onFingerprintAuthenticatedSucceed(FingerprintManager.CryptoObject cryptoObject, boolean withFingerprint) {
-        if (null != getCallback()) {
-            getCallback().onFingerprintAuthenticatedSucceed(cryptoObject, withFingerprint);
+        if (null != getFingerprintCallback()) {
+            getFingerprintCallback().onFingerprintAuthenticatedSucceed(cryptoObject, withFingerprint);
         }
     }
 
     @Override
     public void onFingerprintAuthenticatedSucceed(String passWord, InputPassWordCallback passWordCallback) {
-        if (null != getCallback()) {
-            getCallback().onFingerprintAuthenticatedSucceed(passWord, passWordCallback);
+        if (null != getFingerprintCallback()) {
+            getFingerprintCallback().onFingerprintAuthenticatedSucceed(passWord, passWordCallback);
         }
     }
 }

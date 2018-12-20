@@ -22,43 +22,35 @@ import javax.crypto.NoSuchPaddingException;
  */
 public final class FingerprintCharacterStepBuilder {
 
-    public static final String SECRET_MESSAGE = "Very secret message";
     public static final String DIALOG_FRAGMENT_TAG = "FingerprintAuthenticationDialogFragment";
 
     private FingerprintCharacterStepBuilder() {
     }
 
-    public static KeyStoreStep newBuilder() {
+    public static FingerprintCharacterSteps newBuilder() {
         return new FingerprintCharacterSteps();
     }
 
-    public interface KeyStoreStep {
-        KeyGeneratorStep keyStore();
+    private interface KeyStoreStep {
+        KeyGeneratorStep getKeyStore();
     }
 
-    public interface KeyGeneratorStep {
-        CipherStep keyGenerator();
+    private interface KeyGeneratorStep {
+        CipherStep getKeyGenerator();
     }
 
-    public interface CipherStep {
-        SecretMessage cipher();
+    private interface CipherStep {
+        FingerprintCharacterSteps getCipher();
     }
 
-    public interface SecretMessage {
-        FingerprintCharacterSteps secretMessage(String message);
 
+    private interface KeystoreAlias {
+        DialogFragmentTag setKeystoreAlias(String keystoreAlias);
     }
 
-    public interface DefaultKeyName {
-        DialogFragmentTag defaultKeyName();
-    }
-
-    public interface KeyNameNotInvalidated {
-        DialogFragmentTag keyNameNotInvalidated();
-    }
 
     public interface DialogFragmentTag {
-        FingerprintCallback dialogFragmentTag(String tag);
+        FingerprintCallback setDialogTag(String tag);
     }
 
     public interface FingerprintBuildStep {
@@ -66,20 +58,24 @@ public final class FingerprintCharacterStepBuilder {
     }
 
     public interface FingerprintCallback {
-        FingerprintBuildStep setCallback(FingerprintAuthenticatedCallback callback);
+        FingerprintBuildStep setFingerprintCallback(FingerprintAuthenticatedCallback callback);
     }
 
 
-    public static class FingerprintCharacterSteps implements KeyStoreStep, KeyGeneratorStep, CipherStep, SecretMessage
-            , DefaultKeyName, KeyNameNotInvalidated, DialogFragmentTag, FingerprintCallback, FingerprintBuildStep {
+    public static class FingerprintCharacterSteps implements KeyStoreStep, KeyGeneratorStep, CipherStep
+            , KeystoreAlias, DialogFragmentTag, FingerprintCallback, FingerprintBuildStep {
         private KeyStore keyStore;
         private KeyGenerator keyGenerator;
         private Cipher cipher;
-        private String secretMessage;
-        private String defaultKeyName;//默认的健
-        private String keyNameNotInvalidated; //特定的键
-        private String dialogFragmentTag;
+        private String mKeystoreAlias;//默认的健
+        private String dialogTag;
         private FingerprintAuthenticatedCallback callback;
+
+        public FingerprintCharacterSteps() {
+            KeyGeneratorStep keyStore = getKeyStore(); //获取密钥库
+            CipherStep keyGenerator = keyStore.getKeyGenerator();//获取KeyGenerator实例，用于密钥库的初始化
+            keyGenerator.getCipher(); //获取密码加密和解密的加密密码的功能的实例
+        }
 
         @Override
         public FingerprintCharacter build() {
@@ -93,47 +89,41 @@ public final class FingerprintCharacterStepBuilder {
             if (null != cipher) {
                 character.setCipher(cipher);
             }
-            if (!TextUtils.isEmpty(secretMessage)) {
-                character.setSecretMessage(secretMessage);
+            if (!TextUtils.isEmpty(mKeystoreAlias)) {
+                character.setKeystoreAlias(mKeystoreAlias);
             }
-            if (!TextUtils.isEmpty(defaultKeyName)) {
-                character.setDefaultKeyName(defaultKeyName);
-            }
-            if (!TextUtils.isEmpty(keyNameNotInvalidated)) {
-                character.setKeyNameNotInvalidated(keyNameNotInvalidated);
-            }
-            if (!TextUtils.isEmpty(dialogFragmentTag)) {
-                character.setDialogFragmentTag(dialogFragmentTag);
+            if (!TextUtils.isEmpty(dialogTag)) {
+                character.setDialogTag(dialogTag);
             }
             if (null != callback) {
-                character.setCallback(callback);
+                character.setFingerprintCallback(callback);
             }
             return character;
         }
 
         @Override
-        public KeyGeneratorStep keyStore() {
+        public KeyGeneratorStep getKeyStore() {
             try {
                 this.keyStore = KeyStore.getInstance("AndroidKeyStore"); //获取密钥库
             } catch (KeyStoreException e) {
-                //  获取密码验证失败  Failed to get an instance of KeyStore
+                //  获取密码验证实例失败
             }
             return this;
         }
 
         @Override
-        public CipherStep keyGenerator() {
+        public CipherStep getKeyGenerator() {
             try {
                 this.keyGenerator = KeyGenerator
                         .getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore");
             } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
-                //  2018/11/23 Failed to get an instance of KeyGenerator  获取KeyGenerator实例失败
+                //  2018/11/23   获取KeyGenerator实例失败
             }
             return this;
         }
 
         @Override
-        public SecretMessage cipher() {
+        public FingerprintCharacterSteps getCipher() {
             try {
                 this.cipher = Cipher.getInstance(KeyProperties.KEY_ALGORITHM_AES + File.separator
                         + KeyProperties.BLOCK_MODE_CBC + File.separator
@@ -146,32 +136,20 @@ public final class FingerprintCharacterStepBuilder {
         }
 
         @Override
-        public FingerprintCharacterSteps secretMessage(String message) {
-            this.secretMessage = message;
+        public FingerprintCallback setDialogTag(String tag) {
+            this.dialogTag = tag;
             return this;
         }
 
         @Override
-        public DialogFragmentTag defaultKeyName() {
-            this.defaultKeyName = "default_key";
-            return this;
-        }
-
-        @Override
-        public DialogFragmentTag keyNameNotInvalidated() {
-            this.keyNameNotInvalidated = "key_not_invalidated";
-            return this;
-        }
-
-        @Override
-        public FingerprintCallback dialogFragmentTag(String tag) {
-            this.dialogFragmentTag = tag;
-            return this;
-        }
-
-        @Override
-        public FingerprintBuildStep setCallback(FingerprintAuthenticatedCallback callback) {
+        public FingerprintBuildStep setFingerprintCallback(FingerprintAuthenticatedCallback callback) {
             this.callback = callback;
+            return this;
+        }
+
+        @Override
+        public DialogFragmentTag setKeystoreAlias(String keystoreAlias) {
+            this.mKeystoreAlias = keystoreAlias;
             return this;
         }
     }
