@@ -42,13 +42,14 @@ public class MainActivity extends AppCompatActivity implements FingerprintAuthen
                 .setFingerprintCallback(this)
                 .build();
         //初始化密码验证
-        codedLockAuthenticatedCharacter = CodedLockAuthenticatedStepBuilder.newBuilder()
+        codedLockAuthenticatedCharacter = CodedLockAuthenticatedStepBuilder
+                .newBuilder()
                 .setActivity(MainActivity.this)
-                .onCreateKeyguardManager()
-                .name("my_key")
-                .time(20)
-                .onCreateKey()
-                .onAuthenticationScreenCallBack(MainActivity.this)
+                .getKeyguardManager()
+                .setKeystoreAlias("my_key")
+                .setUserAuthenticationValidityDurationSeconds(10)
+                .getKeyStore()
+                .setAuthenticationScreenCallBack(MainActivity.this)
                 .build();
 
         purchaseButton.setOnClickListener(new View.OnClickListener() {
@@ -88,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements FingerprintAuthen
     private void tryEncrypt(Cipher cipher) {
         try {
             byte[] encrypted = cipher.doFinal("Very secret message".getBytes());
+            LogUtils.e("yyyy", encrypted);
         } catch (BadPaddingException | IllegalBlockSizeException e) {
 
         }
@@ -106,9 +108,9 @@ public class MainActivity extends AppCompatActivity implements FingerprintAuthen
         if (requestCode == CodedLockCharacter.REQUEST_CODE_CONFIRM_DEVICE_CREDENTIALS) {
             if (resultCode == RESULT_OK) {
                 if (codedLockAuthenticatedCharacter.onValidate()) {
-                    LogUtils.e("yyy", "onActivityResult");
+                    LogUtils.e("yyy", "密码验证成功");
                 } else {
-
+                    LogUtils.e("yyy", "密码验证失败");
                 }
             } else {
                 //用户取消或没有完成锁定屏幕
@@ -135,19 +137,11 @@ public class MainActivity extends AppCompatActivity implements FingerprintAuthen
     }
 
     /**
-     * 密码锁验证成功
-     */
-    @Override
-    public void onCodedLockAuthenticationSucceed() {
-        LogUtils.e("yyy", "onAuthenticationSucceed");
-    }
-
-    /**
      * 密码锁验证失败成功
      */
     @Override
     public void onCodedLockAuthenticationFailed() {
-        LogUtils.e("yyy", "onCodedLockAuthenticationFailed");
+        LogUtils.e("yyy", "密码验证失败");
     }
 
     @Override

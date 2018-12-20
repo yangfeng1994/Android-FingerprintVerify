@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.yf.verify.callback.CodedLockAuthenticatedCallBack;
+import com.yf.verify.util.LogUtils;
 
 import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
@@ -37,23 +38,23 @@ public final class CodedLockAuthenticatedStepBuilder {
     }
 
     public interface CreateKeyguardManager {
-        CodedLockName onCreateKeyguardManager();
+        CodedLockName getKeyguardManager();
     }
 
     public interface CodedLockName {
-        AuthenticationDurationSeconds name(String name);
+        AuthenticationDurationSeconds setKeystoreAlias(String name);
     }
 
     public interface AuthenticationDurationSeconds {
-        CreateKey time(int time);
+        CreateKeyStore setUserAuthenticationValidityDurationSeconds(int time);
     }
 
-    public interface CreateKey {
-        AuthenticationScreenCallBack onCreateKey();
+    public interface CreateKeyStore {
+        AuthenticationScreenCallBack getKeyStore();
     }
 
     public interface AuthenticationScreenCallBack {
-        CodedLockAuthenticatedBuildStep onAuthenticationScreenCallBack(CodedLockAuthenticatedCallBack callBack);
+        CodedLockAuthenticatedBuildStep setAuthenticationScreenCallBack(CodedLockAuthenticatedCallBack callBack);
     }
 
     public interface CodedLockAuthenticatedBuildStep {
@@ -62,7 +63,7 @@ public final class CodedLockAuthenticatedStepBuilder {
 
 
     public static class CodedLockAuthenticatedCharacterSteps implements InjectActivity, CreateKeyguardManager, CodedLockName,
-            AuthenticationDurationSeconds, CreateKey, AuthenticationScreenCallBack, CodedLockAuthenticatedBuildStep {
+            AuthenticationDurationSeconds, CreateKeyStore, AuthenticationScreenCallBack, CodedLockAuthenticatedBuildStep {
         private CodedLockAuthenticatedCallBack callBack;
         private Activity mActivity;
 
@@ -70,7 +71,7 @@ public final class CodedLockAuthenticatedStepBuilder {
         /**
          * 我们在Android密钥存储中的密钥的别名。
          */
-        private String keyName;
+        private String mKeystoreAlias;
 
         /**
          * 用户设定的有效时间，如果解锁后，在规定的时间内再次点击，就不会显示解锁失败。
@@ -78,13 +79,13 @@ public final class CodedLockAuthenticatedStepBuilder {
         private int authenticationDurationSeconds;
 
         @Override
-        public CodedLockName onCreateKeyguardManager() {
+        public CodedLockName getKeyguardManager() {
             mKeyguardManager = (KeyguardManager) mActivity.getSystemService(Context.KEYGUARD_SERVICE);
             return this;
         }
 
         @Override
-        public AuthenticationScreenCallBack onCreateKey() {
+        public AuthenticationScreenCallBack getKeyStore() {
             //生成解密支付凭证、令牌等的密钥。
             //这很可能是用户在设置应用程序时的注册步骤。
             try {
@@ -96,7 +97,7 @@ public final class CodedLockAuthenticatedStepBuilder {
                 //在Android密钥库中设置条目的别名，该密钥将出现在该条目中
                 //以及构造器的构造函数中的约束(目的)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    keyGenerator.init(new KeyGenParameterSpec.Builder(keyName,
+                    keyGenerator.init(new KeyGenParameterSpec.Builder(mKeystoreAlias,
                             KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
                             .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
                             .setUserAuthenticationRequired(true)
@@ -109,7 +110,7 @@ public final class CodedLockAuthenticatedStepBuilder {
             } catch (NoSuchAlgorithmException | NoSuchProviderException
                     | InvalidAlgorithmParameterException | KeyStoreException
                     | CertificateException | IOException e) {
-                Log.e("yyyy", "创建对称密钥失败");
+                LogUtils.e("yyyy", "创建对称密钥失败");
             }
             return this;
         }
@@ -123,23 +124,23 @@ public final class CodedLockAuthenticatedStepBuilder {
             if (null != mKeyguardManager) {
                 character.setKeyguardManager(mKeyguardManager);
             }
-            if (!TextUtils.isEmpty(keyName)) {
-                character.setKeyName(keyName);
+            if (!TextUtils.isEmpty(mKeystoreAlias)) {
+                character.setKeystoreAlias(mKeystoreAlias);
             }
             if (null != callBack) {
-                character.setCallBack(callBack);
+                character.setAuthenticationScreenCallBack(callBack);
             }
             return character;
         }
 
         @Override
-        public AuthenticationDurationSeconds name(String name) {
-            keyName = name;
+        public AuthenticationDurationSeconds setKeystoreAlias(String keystoreAlias) {
+            mKeystoreAlias = keystoreAlias;
             return this;
         }
 
         @Override
-        public CreateKey time(int time) {
+        public CreateKeyStore setUserAuthenticationValidityDurationSeconds(int time) {
             authenticationDurationSeconds = time;
             return this;
         }
@@ -151,7 +152,7 @@ public final class CodedLockAuthenticatedStepBuilder {
         }
 
         @Override
-        public CodedLockAuthenticatedBuildStep onAuthenticationScreenCallBack(CodedLockAuthenticatedCallBack callBack) {
+        public CodedLockAuthenticatedBuildStep setAuthenticationScreenCallBack(CodedLockAuthenticatedCallBack callBack) {
             this.callBack = callBack;
             return this;
         }

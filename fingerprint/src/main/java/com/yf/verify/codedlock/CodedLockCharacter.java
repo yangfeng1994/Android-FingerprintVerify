@@ -35,7 +35,7 @@ import javax.crypto.SecretKey;
 public class CodedLockCharacter implements CodedLockBaseCharacter {
     private Activity mActivity;
     private KeyguardManager mKeyguardManager;
-    private String keyName;
+    private String mKeystoreAlias;
     private CodedLockAuthenticatedCallBack callBack;
     public static final int REQUEST_CODE_CONFIRM_DEVICE_CREDENTIALS = 1;
     private static final byte[] SECRET_BYTE_ARRAY = new byte[]{1, 2, 3, 4, 5, 6};
@@ -56,19 +56,19 @@ public class CodedLockCharacter implements CodedLockBaseCharacter {
         this.mKeyguardManager = mKeyguardManager;
     }
 
-    public String getKeyName() {
-        return keyName;
+    public String getKeystoreAlias() {
+        return mKeystoreAlias;
     }
 
-    public void setKeyName(String keyName) {
-        this.keyName = keyName;
+    public void setKeystoreAlias(String mKeystoreAlias) {
+        this.mKeystoreAlias = mKeystoreAlias;
     }
 
-    public CodedLockAuthenticatedCallBack getCallBack() {
+    public CodedLockAuthenticatedCallBack getAuthenticationScreenCallBack() {
         return callBack;
     }
 
-    public void setCallBack(CodedLockAuthenticatedCallBack callBack) {
+    public void setAuthenticationScreenCallBack(CodedLockAuthenticatedCallBack callBack) {
         this.callBack = callBack;
     }
 
@@ -83,7 +83,7 @@ public class CodedLockCharacter implements CodedLockBaseCharacter {
         try {
             KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
             keyStore.load(null);
-            SecretKey secretKey = (SecretKey) keyStore.getKey(getKeyName(), null);
+            SecretKey secretKey = (SecretKey) keyStore.getKey(getKeystoreAlias(), null);
             Cipher cipher = Cipher.getInstance(
                     KeyProperties.KEY_ALGORITHM_AES + File.separator + KeyProperties.BLOCK_MODE_CBC + File.separator
                             + KeyProperties.ENCRYPTION_PADDING_PKCS7);
@@ -91,10 +91,10 @@ public class CodedLockCharacter implements CodedLockBaseCharacter {
             // 尝试加密某些东西，只有在最后一个AUTHENTICATION_DURATION_SECONDS 秒内通过身份验证的用户才会成功。
             cipher.init(Cipher.ENCRYPT_MODE, secretKey);
             cipher.doFinal(SECRET_BYTE_ARRAY);
-            // 如果用户用户设置的秒内已经通过了密码验证。
-            if (null != getCallBack()) {
-                getCallBack().onCodedLockAuthenticationSucceed();
-            }
+//            // 如果用户用户设置的秒内已经通过了密码验证。
+//            if (null != getCallBack()) {
+//                getCallBack().onCodedLockAuthenticationSucceed();
+//            }
             return true;
         } catch (UserNotAuthenticatedException e) {
             // 用户未通过身份验证，让我们使用设备凭据进行身份验证。
@@ -104,15 +104,15 @@ public class CodedLockCharacter implements CodedLockBaseCharacter {
             //如果锁定屏幕已被禁用或在密钥被禁用后重新设置，则会发生这种情况
             //生成密钥后生成。
             //键在创建后无效。重试
-            if (null != getCallBack()) {
-                getCallBack().onCodedLockAuthenticationFailed();
+            if (null != getAuthenticationScreenCallBack()) {
+                getAuthenticationScreenCallBack().onCodedLockAuthenticationFailed();
             }
             return false;
         } catch (BadPaddingException | IllegalBlockSizeException | KeyStoreException |
                 CertificateException | UnrecoverableKeyException | IOException
                 | NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException e) {
-            if (null != getCallBack()) {
-                getCallBack().onCodedLockAuthenticationFailed();
+            if (null != getAuthenticationScreenCallBack()) {
+                getAuthenticationScreenCallBack().onCodedLockAuthenticationFailed();
             }
             return false;
         }
@@ -133,13 +133,13 @@ public class CodedLockCharacter implements CodedLockBaseCharacter {
             if (null != activity && null != intent) {
                 activity.startActivityForResult(intent, REQUEST_CODE_CONFIRM_DEVICE_CREDENTIALS);
             } else {
-                if (null != getCallBack()) {
-                    getCallBack().onCodedLockAuthenticationFailed();
+                if (null != getAuthenticationScreenCallBack()) {
+                    getAuthenticationScreenCallBack().onCodedLockAuthenticationFailed();
                 }
             }
         } else {
-            if (null != getCallBack()) {
-                getCallBack().onCodedLockAuthenticationFailed();
+            if (null != getAuthenticationScreenCallBack()) {
+                getAuthenticationScreenCallBack().onCodedLockAuthenticationFailed();
             }
         }
     }

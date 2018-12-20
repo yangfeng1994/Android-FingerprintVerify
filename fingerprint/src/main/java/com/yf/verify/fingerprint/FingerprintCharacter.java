@@ -39,7 +39,7 @@ public class FingerprintCharacter implements FingerprintBaseCharacter, UpdateFin
     private KeyStore keyStore;
     private KeyGenerator keyGenerator;
     private Cipher cipher;
-    public String mKeystoreAlias;
+    private String mKeystoreAlias;
     private String mDialogTag;
     private FingerprintAuthenticatedCallback callback;
 

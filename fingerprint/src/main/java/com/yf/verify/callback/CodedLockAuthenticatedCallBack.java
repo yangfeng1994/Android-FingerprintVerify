@@ -6,7 +6,5 @@ package com.yf.verify.callback;
  * @Describe
  */
 public interface CodedLockAuthenticatedCallBack {
-    void onCodedLockAuthenticationSucceed();
-
     void onCodedLockAuthenticationFailed();
 }
