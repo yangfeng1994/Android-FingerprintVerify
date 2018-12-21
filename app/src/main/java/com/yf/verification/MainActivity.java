@@ -1,8 +1,11 @@
 package com.yf.verification;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.hardware.biometrics.BiometricPrompt;
 import android.hardware.fingerprint.FingerprintManager;
 import android.os.Build;
+import android.os.CancellationSignal;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -27,6 +30,8 @@ import javax.crypto.IllegalBlockSizeException;
 public class MainActivity extends AppCompatActivity implements FingerprintAuthenticatedCallback, CodedLockAuthenticatedCallBack {
     private FingerprintCharacter fingerprintAuthenticatedCharacter;
     private CodedLockCharacter codedLockAuthenticatedCharacter;
+    private BiometricPrompt mBiometricPrompt;
+    private CancellationSignal mCancellationSignal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +46,15 @@ public class MainActivity extends AppCompatActivity implements FingerprintAuthen
                 .setDialogTag(FingerprintCharacterStepBuilder.DIALOG_FRAGMENT_TAG)
                 .setFingerprintCallback(this)
                 .build();
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+            mBiometricPrompt = new BiometricPrompt.Builder(MainActivity.this).setDescription("支付金额").setNegativeButton("取消支付", getMainExecutor(), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Log.e("yyyy", "DialogInterface");
+                }
+            }).setSubtitle("用户进行支付").setTitle("支付").build();
+        }
+
         //初始化密码验证
         codedLockAuthenticatedCharacter = CodedLockAuthenticatedStepBuilder
                 .newBuilder()
@@ -55,7 +69,34 @@ public class MainActivity extends AppCompatActivity implements FingerprintAuthen
         purchaseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                fingerprintAuthenticatedCharacter.show(getSupportFragmentManager());
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    mCancellationSignal = new CancellationSignal();
+                    mBiometricPrompt.authenticate(mCancellationSignal, getMainExecutor(), new BiometricPrompt.AuthenticationCallback() {
+                        @Override
+                        public void onAuthenticationError(int errorCode, CharSequence errString) {
+                            super.onAuthenticationError(errorCode, errString);
+                            mCancellationSignal.cancel();
+                        }
+
+                        @Override
+                        public void onAuthenticationHelp(int helpCode, CharSequence helpString) {
+                            super.onAuthenticationHelp(helpCode, helpString);
+                        }
+
+                        @Override
+                        public void onAuthenticationSucceeded(BiometricPrompt.AuthenticationResult result) {
+                            super.onAuthenticationSucceeded(result);
+                            mCancellationSignal.cancel();
+                        }
+
+                        @Override
+                        public void onAuthenticationFailed() {
+                            super.onAuthenticationFailed();
+                        }
+                    });
+                } else {
+                    fingerprintAuthenticatedCharacter.show(getSupportFragmentManager());
+                }
             }
         });
         passwordButton.setOnClickListener(new View.OnClickListener() {

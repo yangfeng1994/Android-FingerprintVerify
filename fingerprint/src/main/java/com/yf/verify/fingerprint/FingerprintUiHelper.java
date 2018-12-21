@@ -57,7 +57,7 @@ public class FingerprintUiHelper extends FingerprintManager.AuthenticationCallba
         mCallback = callback;
     }
 
-    public FingerprintManager getFingerprintManager(Context context) { // TODO: 2018/12/20 BiometricPrompt 替换 FingerprintManager
+    public FingerprintManager getFingerprintManager(Context context) {
         FingerprintManager fingerprintManager = null;
         try {
             fingerprintManager = context.getSystemService(FingerprintManager.class);

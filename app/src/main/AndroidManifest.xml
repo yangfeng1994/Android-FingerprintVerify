@@ -4,6 +4,7 @@
     package="com.yf.verification">
 
 
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
     <application
         android:allowBackup="true"
         android:icon="@drawable/icon_fingerprint"
