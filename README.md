@@ -96,6 +96,11 @@
   }
 
     指纹验证使用方法与回调到此结束了。
+
+    我看到有博客说 在 api28以后 FingerprintManager 被弃用，已被 BiometricPrompt 代替，但当我点进
+    BiometricPrompt 后发现，它里面其实还是用 FingerprintManager 实现的， 只是对 FingerprintManager 进行了封装，后期怎么改也不可而知，
+    估计官方会加入一些其他的生物识别功能。
+
 #  2. 可以进行手机自带密码锁的验证，当你跳转到密码验证界面的时候，
 还可以进行指纹验证
 
@@ -178,6 +183,30 @@ codedLockAuthenticatedCharacter = CodedLockAuthenticatedStepBuilder
          LogUtils.e("yyy", "密码验证失败");
      }
 
+
+如果您build 的时候出现了
+
+        Android dependency 'com.android.support:support-core-utils' has different version for the compile (27.1.1) and runtime (28.0.0) classpath. You should manually set the same version via DependencyResolution
+
+    或者有冲突包的话，那建议您 在你的仓库的build 里面添加
+
+        subprojects {
+        project.configurations.all {
+            resolutionStrategy.eachDependency { details ->
+                if (details.requested.group == 'com.android.support'
+                        && !details.requested.name.contains('multidex')) {
+                    details.useVersion "27.1.1"
+                }
+                if (details.requested.group == 'android.arch.lifecycle') {
+                    details.useVersion "1.1.1"
+                }
+            }
+        }
+    }
+
+    对您想买中导入的 support 库进行拦截，强制使用某个版本，我目前强制使用的是27.1.1
+
+    如有问题 请联系微信 yf2921
 
 
 
