@@ -9,7 +9,6 @@ import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
 
 import com.yf.verify.callback.FingerprintAuthenticatedCallback;
 import com.yf.verify.callback.FingerprintBaseCharacter;
-import com.yf.verify.fingerprint.factory.BiometricPromptFactory;
 
 import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;

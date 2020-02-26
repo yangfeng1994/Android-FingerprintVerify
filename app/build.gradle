@@ -12,20 +12,22 @@ android {
     }
     signingConfigs {
         config {
-            keyAlias 'finger'
-            keyPassword '123456'
+            keyAlias 'qwer'
+            keyPassword 'qwer123'
             storeFile file('finger_print_verify.jks')
-            storePassword '123456'
+            storePassword 'qwer123'
         }
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.config
         }
+
         debug {
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.config
         }

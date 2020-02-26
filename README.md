@@ -1,10 +1,19 @@
 # Android-FingerprintVerify
 
+[![](https://jitpack.io/v/yangfeng1994/Android-FingerprintVerify.svg)](https://jitpack.io/#yangfeng1994/Android-FingerprintVerify)
+
 #### 项目介绍
 
-### 一个用于Android手机指纹验证与密码锁验证的项目，使用建造者模式，创建指纹密钥的实例
-，调用弹出验证框进行验证。
+### 一个用于Android手机指纹验证与密码锁验证的项目，使用建造者模式，创建指纹密钥的实例或者调用手机密码进行验证。
 
+项目支持 androidx 或者 support
+
+本项目没有引入任何第三方库，不会对您的项目有任何的代码侵入
+
+# 项目截图
+
+![image](https://github.com/yangfeng1994/Android-FingerprintVerify/blob/dev/app/pic/finger_gif.gif)
+<img src="/app/pic/finger_pic_screen.jpg" alt="图-2：finger_pic_screen" width="380px"></img>
 
 #### 导入方法
 
@@ -91,18 +100,8 @@
 
 
 #  2. 可以进行手机自带密码锁的验证
-#### 初始化密码验证
+####部分方法介绍
 ```
-codedLockAuthenticatedCharacter = CodedLockAuthenticatedStepBuilder
-                    .newBuilder()
-                    .setActivity(MainActivity.this)
-                    .getKeyguardManager()
-                    .setKeystoreAlias("my_key")
-                    .setUserAuthenticationValidityDurationSeconds(3)
-                    .getKeyStore()
-                    .setAuthenticationScreenCallBack(MainActivity.this)
-                    .build();
-
    1.   setActivity()设置activity 上下文对象，用来获取密码管理类
 
    2.   setKeystoreAlias("")    添加你应用的密码库的别名
@@ -127,11 +126,28 @@ codedLockAuthenticatedCharacter = CodedLockAuthenticatedStepBuilder
 
       ```
 
+#### 初始化密码验证
+```
+codedLockAuthenticatedCharacter = CodedLockAuthenticatedStepBuilder
+                    .newBuilder()
+                    .setActivity(MainActivity.this)
+                    .getKeyguardManager()
+                    .setKeystoreAlias("my_key")//可随便填写
+                    .setUserAuthenticationValidityDurationSeconds(3)
+                    .getKeyStore()
+                    .setAuthenticationScreenCallBack(MainActivity.this)
+                    .build();
+```
+
+
+
 ####跳到密码验证界面，去验证密码
 ```
 	 if (codedLockAuthenticatedCharacter.isKeyguardSecure()) {
       	codedLockAuthenticatedCharacter.onValidate();
-       }
+       }else{
+	    Toast.makeText(MainActivity.this, "没有设置密码锁", Toast.LENGTH_SHORT).show();
+	   }
 ```
 
 
@@ -172,18 +188,11 @@ codedLockAuthenticatedCharacter = CodedLockAuthenticatedStepBuilder
          Toast.makeText(this, "密码验证取消", Toast.LENGTH_SHORT).show();
      }
 ```
+
+###项目如需混淆
+```
+-keep class com.yf.verify.** {*;}
+
+```
 ###如有问题 请联系微信 yf2921
-
-
-
-
-
-
-
-
-
-
-
-
-
 
