@@ -22,8 +22,6 @@ import javax.crypto.NoSuchPaddingException;
  */
 public final class FingerprintCharacterStepBuilder {
 
-    public static final String DIALOG_FRAGMENT_TAG = "FingerprintAuthenticationDialogFragment";
-
     private FingerprintCharacterStepBuilder() {
     }
 
@@ -45,30 +43,26 @@ public final class FingerprintCharacterStepBuilder {
 
 
     private interface KeystoreAlias {
-        DialogFragmentTag setKeystoreAlias(String keystoreAlias);
-    }
-
-
-    public interface DialogFragmentTag {
-        FingerprintCallback setDialogTag(String tag);
-    }
-
-    public interface FingerprintBuildStep {
-        FingerprintCharacter build();
+        FingerprintCallback setKeystoreAlias(String keystoreAlias);
     }
 
     public interface FingerprintCallback {
         FingerprintBuildStep setFingerprintCallback(FingerprintAuthenticatedCallback callback);
     }
 
+    public interface FingerprintBuildStep {
+        FingerprintCharacter build();
+    }
+
+
+
 
     public static class FingerprintCharacterSteps implements KeyStoreStep, KeyGeneratorStep, CipherStep
-            , KeystoreAlias, DialogFragmentTag, FingerprintCallback, FingerprintBuildStep {
+            , KeystoreAlias,  FingerprintCallback, FingerprintBuildStep {
         private KeyStore keyStore;
         private KeyGenerator keyGenerator;
         private Cipher cipher;
         private String mKeystoreAlias;//默认的健
-        private String dialogTag;
         private FingerprintAuthenticatedCallback callback;
 
         public FingerprintCharacterSteps() {
@@ -91,9 +85,6 @@ public final class FingerprintCharacterStepBuilder {
             }
             if (!TextUtils.isEmpty(mKeystoreAlias)) {
                 character.setKeystoreAlias(mKeystoreAlias);
-            }
-            if (!TextUtils.isEmpty(dialogTag)) {
-                character.setDialogTag(dialogTag);
             }
             if (null != callback) {
                 character.setFingerprintCallback(callback);
@@ -135,11 +126,6 @@ public final class FingerprintCharacterStepBuilder {
             return this;
         }
 
-        @Override
-        public FingerprintCallback setDialogTag(String tag) {
-            this.dialogTag = tag;
-            return this;
-        }
 
         @Override
         public FingerprintBuildStep setFingerprintCallback(FingerprintAuthenticatedCallback callback) {
@@ -148,7 +134,7 @@ public final class FingerprintCharacterStepBuilder {
         }
 
         @Override
-        public DialogFragmentTag setKeystoreAlias(String keystoreAlias) {
+        public FingerprintCallback setKeystoreAlias(String keystoreAlias) {
             this.mKeystoreAlias = keystoreAlias;
             return this;
         }

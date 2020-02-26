@@ -1,4 +1,4 @@
-package com.yf.verify.callback;
+package com.yf.verify.base;
 
 /**
  * @author yangfeng

@@ -8,9 +8,12 @@ import android.os.Build;
 import android.security.keystore.KeyPermanentlyInvalidatedException;
 import android.security.keystore.KeyProperties;
 import android.security.keystore.UserNotAuthenticatedException;
+import android.support.annotation.Nullable;
+import android.widget.Toast;
 
 import com.yf.verify.callback.CodedLockBaseCharacter;
 import com.yf.verify.callback.CodedLockAuthenticatedCallBack;
+import com.yf.verify.util.LogUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -146,6 +149,21 @@ public class CodedLockCharacter implements CodedLockBaseCharacter {
     @Override
     public void onDestroy() {
         mKeyguardManager = null;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == CodedLockCharacter.REQUEST_CODE_CONFIRM_DEVICE_CREDENTIALS) {
+            if (resultCode == Activity.RESULT_OK) {
+                if (onValidate()) {
+                    getAuthenticationScreenCallBack().onCodedLockAuthenticationSucceed();
+                } else {
+                    getAuthenticationScreenCallBack().onCodedLockAuthenticationFailed();
+                }
+            } else {
+                getAuthenticationScreenCallBack().onCodedLockAuthenticationCancel();
+            }
+        }
     }
 
     /**

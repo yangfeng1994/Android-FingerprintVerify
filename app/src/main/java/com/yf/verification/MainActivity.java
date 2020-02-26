@@ -1,15 +1,9 @@
 package com.yf.verification;
 
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.hardware.biometrics.BiometricPrompt;
-import android.hardware.fingerprint.FingerprintManager;
-import android.os.Build;
-import android.os.CancellationSignal;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -20,12 +14,6 @@ import com.yf.verify.codedlock.CodedLockCharacter;
 import com.yf.verify.codedlock.CodedLockAuthenticatedStepBuilder;
 import com.yf.verify.fingerprint.FingerprintCharacter;
 import com.yf.verify.fingerprint.FingerprintCharacterStepBuilder;
-import com.yf.verify.callback.InputPassWordCallback;
-import com.yf.verify.util.LogUtils;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
 
 public class MainActivity extends AppCompatActivity implements FingerprintAuthenticatedCallback, CodedLockAuthenticatedCallBack {
     private FingerprintCharacter fingerprintAuthenticatedCharacter;
@@ -41,7 +29,6 @@ public class MainActivity extends AppCompatActivity implements FingerprintAuthen
         fingerprintAuthenticatedCharacter = FingerprintCharacterStepBuilder
                 .newBuilder()
                 .setKeystoreAlias("key1")
-                .setDialogTag(FingerprintCharacterStepBuilder.DIALOG_FRAGMENT_TAG)
                 .setFingerprintCallback(this)
                 .build();
 
@@ -72,13 +59,6 @@ public class MainActivity extends AppCompatActivity implements FingerprintAuthen
         });
     }
 
-    /**
-     * 指纹验证成功
-     */
-    @Override
-    public void onFingerprintAuthenticatedSucceed() {
-        Toast.makeText(this, "指纹验证成功", Toast.LENGTH_SHORT).show();
-    }
 
     /**
      * 密码验证activity跳转回传的结果
@@ -90,35 +70,30 @@ public class MainActivity extends AppCompatActivity implements FingerprintAuthen
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == CodedLockCharacter.REQUEST_CODE_CONFIRM_DEVICE_CREDENTIALS) {
-            if (resultCode == RESULT_OK) {
-                if (codedLockAuthenticatedCharacter.onValidate()) {
-                    LogUtils.e("yyy", "密码验证成功");
-                } else {
-                    LogUtils.e("yyy", "密码验证失败");
-                }
-            } else {
-                //用户取消或没有完成锁定屏幕
-                Toast.makeText(this, "用户取消或没有完成锁定屏幕", Toast.LENGTH_SHORT).show();
-            }
-        }
+        codedLockAuthenticatedCharacter.onActivityResult(requestCode, resultCode, data);
     }
 
     /**
-     * @param passWord
-     * @param passWordCallback
+     * 指纹验证成功
      */
     @Override
-    public void onFingerprintAuthenticatedSucceed(String passWord, InputPassWordCallback passWordCallback) {
-        if ("1234".equals(passWord)) {//成功后，调用成功的方法，在dialog中，可以让dialog关闭
-            if (null != passWordCallback) {
-                passWordCallback.onInputSucceed();
-            }
-        } else {
-            if (null != passWordCallback) {//失败后，调用失败的方法，在dialog中，可以弹出toast，如果想自己定义，可以不调用次方法
-                passWordCallback.onInputFailed();
-            }
-        }
+    public void onFingerprintSucceed() {
+        Toast.makeText(this, "指纹验证成功", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onFingerprintFailed() {
+
+    }
+
+    @Override
+    public void onFingerprintCancel() {
+
+    }
+
+    @Override
+    public void noEnrolledFingerprints() {
+        Toast.makeText(this, "没有录入指纹锁", Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -126,7 +101,17 @@ public class MainActivity extends AppCompatActivity implements FingerprintAuthen
      */
     @Override
     public void onCodedLockAuthenticationFailed() {
-        LogUtils.e("yyy", "密码验证失败");
+        Toast.makeText(this, "密码验证失败", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onCodedLockAuthenticationSucceed() {
+        Toast.makeText(this, "密码验证成功", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onCodedLockAuthenticationCancel() {
+        Toast.makeText(this, "密码验证取消", Toast.LENGTH_SHORT).show();
     }
 
     @Override

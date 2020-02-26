@@ -17,14 +17,14 @@
 package com.yf.verify.fingerprint;
 
 import android.annotation.TargetApi;
-import android.content.Context;
-import android.hardware.fingerprint.FingerprintManager;
 import android.os.Build;
-import android.os.CancellationSignal;
+import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
+import android.support.v4.os.CancellationSignal;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.yf.verify.R;
+import com.yf.verify.callback.FingerprintAuthenticatedCallback;
 
 
 /**
@@ -32,15 +32,15 @@ import com.yf.verify.R;
  */
 
 @TargetApi(Build.VERSION_CODES.M)
-public class FingerprintUiHelper extends FingerprintManager.AuthenticationCallback {
+public class FingerprintUiHelper extends FingerprintManagerCompat.AuthenticationCallback {
 
     private static final long ERROR_TIMEOUT_MILLIS = 1600;
     private static final long SUCCESS_DELAY_MILLIS = 1300;
 
-    private final FingerprintManager mFingerprintManager;
+    private final FingerprintManagerCompat mFingerprintManager;
     private final ImageView mIcon;
     private final TextView mErrorTextView;
-    private final Callback mCallback;
+    private final FingerprintAuthenticatedCallback mCallback;
     private CancellationSignal mCancellationSignal;
 
     private boolean mSelfCancelled;
@@ -48,49 +48,33 @@ public class FingerprintUiHelper extends FingerprintManager.AuthenticationCallba
     /**
      * Constructor for {@link FingerprintUiHelper}.
      */
-    FingerprintUiHelper(Context context,
-                        ImageView icon, TextView errorTextView, Callback callback) {
-        mFingerprintManager = getFingerprintManager(context);
-
+    FingerprintUiHelper(
+            ImageView icon, TextView errorTextView, FingerprintManagerCompat fingerprintManager, FingerprintAuthenticatedCallback callback) {
+        this.mFingerprintManager = fingerprintManager;
         mIcon = icon;
         mErrorTextView = errorTextView;
         mCallback = callback;
     }
 
-    public FingerprintManager getFingerprintManager(Context context) {
-        FingerprintManager fingerprintManager = null;
-        try {
-            fingerprintManager = context.getSystemService(FingerprintManager.class);
-        } catch (Throwable e) {
-        }
-        return fingerprintManager;
-    }
-
-    public boolean isFingerprintAuthAvailable() {
-        // 判断是否录入指纹
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (null != mFingerprintManager && mFingerprintManager.isHardwareDetected()) {
-                if (mFingerprintManager.hasEnrolledFingerprints()) { // 是否录入指纹
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 
     /**
      * 开启指纹验证
      *
      * @param cryptoObject
      */
-    public void startListening(FingerprintManager.CryptoObject cryptoObject) {
-        if (!isFingerprintAuthAvailable()) {
-            return;
-        }
+    public void startListening(FingerprintManagerCompat.CryptoObject cryptoObject) {
         mCancellationSignal = new CancellationSignal();
+        mCancellationSignal.setOnCancelListener(new CancellationSignal.OnCancelListener() {
+            @Override
+            public void onCancel() {
+                if (null != mCallback) {
+                    mCallback.onFingerprintCancel();
+                }
+            }
+        });
         mSelfCancelled = false;
         mFingerprintManager
-                .authenticate(cryptoObject, mCancellationSignal, 0 /* flags */, this, null);
+                .authenticate(cryptoObject, 0, mCancellationSignal, this, null);
         mIcon.setImageResource(R.drawable.icon_fingerprint);
     }
 
@@ -110,7 +94,7 @@ public class FingerprintUiHelper extends FingerprintManager.AuthenticationCallba
                 @Override
                 public void run() {
                     if (null != mCallback) {
-                        mCallback.onError();
+                        mCallback.onFingerprintFailed();
                     }
                 }
             }, ERROR_TIMEOUT_MILLIS);
@@ -128,7 +112,7 @@ public class FingerprintUiHelper extends FingerprintManager.AuthenticationCallba
     }
 
     @Override
-    public void onAuthenticationSucceeded(FingerprintManager.AuthenticationResult result) {
+    public void onAuthenticationSucceeded(FingerprintManagerCompat.AuthenticationResult result) {
         mErrorTextView.removeCallbacks(mResetErrorTextRunnable);
         mIcon.setImageResource(R.drawable.ic_fingerprint_success);
         mErrorTextView.setTextColor(
@@ -138,7 +122,7 @@ public class FingerprintUiHelper extends FingerprintManager.AuthenticationCallba
             @Override
             public void run() {
                 if (null != mCallback) {
-                    mCallback.onAuthenticated();
+                    mCallback.onFingerprintSucceed();
                 }
             }
         }, SUCCESS_DELAY_MILLIS);
@@ -158,15 +142,9 @@ public class FingerprintUiHelper extends FingerprintManager.AuthenticationCallba
         public void run() {
             mErrorTextView.setTextColor(
                     mErrorTextView.getResources().getColor(R.color.hint_color, null));
-            mErrorTextView.setText("触摸感应器");
+            mErrorTextView.setText("请触摸指纹进行验证");
             mIcon.setImageResource(R.drawable.icon_fingerprint);
         }
     };
 
-    public interface Callback {
-
-        void onAuthenticated();
-
-        void onError();
-    }
 }
