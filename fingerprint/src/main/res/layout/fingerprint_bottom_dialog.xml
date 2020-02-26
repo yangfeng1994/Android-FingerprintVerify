@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/shape_fringerprint_dialog_bg"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/fingerprint_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="30dp"
+        android:fontFamily="sans-serif-condensed-light"
+        android:text="指纹验证"
+        android:textColor="@android:color/black"
+        android:textSize="18dp"
+        android:textStyle="bold" />
+
+
+    <ImageView
+        android:id="@+id/fingerprint_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="50dp"
+        android:src="@drawable/icon_fingerprint" />
+
+    <TextView
+        android:id="@+id/fingerprint_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="16dp"
+        android:gravity="center_vertical"
+        android:text="请触摸指纹进行验证"
+        android:textColor="#3e3e3e"
+        android:textSize="12dp" />
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="64dp" />
+
+    <TextView
+        android:id="@+id/fingerprint_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="24dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:fontFamily="sans-serif-condensed-light"
+        android:padding="4dp"
+        android:text="取消"
+        android:textColor="@android:color/black"
+        android:textSize="12dp"
+        android:textStyle="bold" />
+
+</LinearLayout>

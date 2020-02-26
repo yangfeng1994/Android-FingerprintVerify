@@ -1,6 +1,10 @@
 package com.yf.verify.callback;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.support.annotation.Nullable;
+
+import com.yf.verify.base.BaseCharacter;
 
 /**
  * @author yangfeng
@@ -15,4 +19,6 @@ public interface CodedLockBaseCharacter extends BaseCharacter {
     void showAuthenticationScreen(Activity activity);
 
     void onDestroy();
+
+    void onActivityResult(int requestCode, int resultCode, @Nullable Intent data);
 }

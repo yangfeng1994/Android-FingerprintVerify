@@ -20,22 +20,6 @@ allprojects {
         jcenter()
     }
 }
-/**
- * todo 如果用的support包与model中不同，可以用此进行拦截
- */
-subprojects {
-    project.configurations.all {
-        resolutionStrategy.eachDependency { details ->
-            if (details.requested.group == 'com.android.support'
-                    && !details.requested.name.contains('multidex')) {
-                details.useVersion "27.1.1"
-            }
-            if (details.requested.group == 'android.arch.lifecycle') {
-                details.useVersion "1.1.1"
-            }
-        }
-    }
-}
 
 task clean(type: Delete) {
     delete rootProject.buildDir
