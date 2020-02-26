@@ -77,7 +77,6 @@ public class CodedLockCharacter implements CodedLockBaseCharacter {
      *
      * @return 返回值为是否验证成功
      */
-    @TargetApi(Build.VERSION_CODES.M)
     @Override
     public boolean onValidate() {
         try {

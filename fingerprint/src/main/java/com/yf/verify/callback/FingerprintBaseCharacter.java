@@ -2,6 +2,7 @@ package com.yf.verify.callback;
 
 import android.hardware.fingerprint.FingerprintManager;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 
 import javax.crypto.Cipher;
@@ -13,7 +14,7 @@ import javax.crypto.Cipher;
  */
 public interface FingerprintBaseCharacter extends BaseCharacter{
 
-    void show(FragmentManager fragmentManager);
+    void show(FragmentActivity activity);
 
     void onCreateKey(String keyName, boolean invalidatedByBiometricEnrollment);
 

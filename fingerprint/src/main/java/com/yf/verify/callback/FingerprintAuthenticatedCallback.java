@@ -1,6 +1,5 @@
 package com.yf.verify.callback;
 
-import android.hardware.fingerprint.FingerprintManager;
 
 /**
  * @author yangfeng
@@ -8,7 +7,7 @@ import android.hardware.fingerprint.FingerprintManager;
  * @Describe 指纹或密码验证的callback
  */
 public interface FingerprintAuthenticatedCallback {
-    void onFingerprintAuthenticatedSucceed(FingerprintManager.CryptoObject cryptoObject, boolean withFingerprint);
+    void onFingerprintAuthenticatedSucceed();
 
     void onFingerprintAuthenticatedSucceed(String passWord, InputPassWordCallback passWordCallback);
 }

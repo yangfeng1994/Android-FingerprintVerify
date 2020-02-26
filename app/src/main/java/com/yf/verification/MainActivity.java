@@ -30,8 +30,6 @@ import javax.crypto.IllegalBlockSizeException;
 public class MainActivity extends AppCompatActivity implements FingerprintAuthenticatedCallback, CodedLockAuthenticatedCallBack {
     private FingerprintCharacter fingerprintAuthenticatedCharacter;
     private CodedLockCharacter codedLockAuthenticatedCharacter;
-    private BiometricPrompt mBiometricPrompt;
-    private CancellationSignal mCancellationSignal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,14 +44,6 @@ public class MainActivity extends AppCompatActivity implements FingerprintAuthen
                 .setDialogTag(FingerprintCharacterStepBuilder.DIALOG_FRAGMENT_TAG)
                 .setFingerprintCallback(this)
                 .build();
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
-            mBiometricPrompt = new BiometricPrompt.Builder(MainActivity.this).setDescription("支付金额").setNegativeButton("取消支付", getMainExecutor(), new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    Log.e("yyyy", "DialogInterface");
-                }
-            }).setSubtitle("用户进行支付").setTitle("支付").build();
-        }
 
         //初始化密码验证
         codedLockAuthenticatedCharacter = CodedLockAuthenticatedStepBuilder
@@ -61,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements FingerprintAuthen
                 .setActivity(MainActivity.this)
                 .getKeyguardManager()
                 .setKeystoreAlias("my_key")
-                .setUserAuthenticationValidityDurationSeconds(10)
+                .setUserAuthenticationValidityDurationSeconds(3)
                 .getKeyStore()
                 .setAuthenticationScreenCallBack(MainActivity.this)
                 .build();
@@ -69,34 +59,7 @@ public class MainActivity extends AppCompatActivity implements FingerprintAuthen
         purchaseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                    mCancellationSignal = new CancellationSignal();
-                    mBiometricPrompt.authenticate(mCancellationSignal, getMainExecutor(), new BiometricPrompt.AuthenticationCallback() {
-                        @Override
-                        public void onAuthenticationError(int errorCode, CharSequence errString) {
-                            super.onAuthenticationError(errorCode, errString);
-                            mCancellationSignal.cancel();
-                        }
-
-                        @Override
-                        public void onAuthenticationHelp(int helpCode, CharSequence helpString) {
-                            super.onAuthenticationHelp(helpCode, helpString);
-                        }
-
-                        @Override
-                        public void onAuthenticationSucceeded(BiometricPrompt.AuthenticationResult result) {
-                            super.onAuthenticationSucceeded(result);
-                            mCancellationSignal.cancel();
-                        }
-
-                        @Override
-                        public void onAuthenticationFailed() {
-                            super.onAuthenticationFailed();
-                        }
-                    });
-                } else {
-                    fingerprintAuthenticatedCharacter.show(getSupportFragmentManager());
-                }
+                fingerprintAuthenticatedCharacter.show(MainActivity.this);
             }
         });
         passwordButton.setOnClickListener(new View.OnClickListener() {
@@ -109,31 +72,12 @@ public class MainActivity extends AppCompatActivity implements FingerprintAuthen
         });
     }
 
-
+    /**
+     * 指纹验证成功
+     */
     @Override
-    public void onFingerprintAuthenticatedSucceed(FingerprintManager.CryptoObject cryptoObject, boolean withFingerprint) {
-        onPurchased( /* withFingerprint */ withFingerprint, cryptoObject);
-    }
-
-    public void onPurchased(boolean withFingerprint,
-                            @Nullable FingerprintManager.CryptoObject cryptoObject) {
-        if (withFingerprint) {
-            // 如果用户已通过指纹验证，请使用密码学和验证
-            //然后显示确认信息。
-            assert cryptoObject != null;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                tryEncrypt(cryptoObject.getCipher());
-            }
-        }
-    }
-
-    private void tryEncrypt(Cipher cipher) {
-        try {
-            byte[] encrypted = cipher.doFinal("Very secret message".getBytes());
-            LogUtils.e("yyyy", encrypted);
-        } catch (BadPaddingException | IllegalBlockSizeException e) {
-
-        }
+    public void onFingerprintAuthenticatedSucceed() {
+        Toast.makeText(this, "指纹验证成功", Toast.LENGTH_SHORT).show();
     }
 
     /**

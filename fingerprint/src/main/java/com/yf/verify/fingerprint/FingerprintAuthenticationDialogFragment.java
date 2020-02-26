@@ -98,7 +98,7 @@ public class FingerprintAuthenticationDialogFragment extends DialogFragment impl
         });
         mFingerprintContent = v.findViewById(R.id.fingerprint_container);
         mBackupContent = v.findViewById(R.id.backup_container);
-        mPassword =  v.findViewById(R.id.password);
+        mPassword = v.findViewById(R.id.password);
         mPassword.setOnEditorActionListener(this);
         mPasswordDescriptionTextView = v.findViewById(R.id.password_description);
         mUseFingerprintFutureCheckBox =
@@ -236,7 +236,7 @@ public class FingerprintAuthenticationDialogFragment extends DialogFragment impl
     public void onAuthenticated() {
         // 从FingerprintUiHelper回调。让活动知道身份验证是成功的,然后把成功的回调传个调用者
         if (null != mFingerprintAuthenticatedCallback) {
-            mFingerprintAuthenticatedCallback.onFingerprintAuthenticatedSucceed(mCryptoObject, true);
+            mFingerprintAuthenticatedCallback.onFingerprintAuthenticatedSucceed();
         }
         dismiss();
     }

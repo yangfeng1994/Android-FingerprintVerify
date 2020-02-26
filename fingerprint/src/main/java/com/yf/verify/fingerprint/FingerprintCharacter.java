@@ -5,6 +5,7 @@ import android.os.Build;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
 
@@ -12,6 +13,7 @@ import com.yf.verify.callback.FingerprintAuthenticatedCallback;
 import com.yf.verify.callback.FingerprintBaseCharacter;
 import com.yf.verify.callback.InputPassWordCallback;
 import com.yf.verify.callback.UpdateFingerprintCallback;
+import com.yf.verify.fingerprint.factory.BiometricPromptFactory;
 
 import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
@@ -95,32 +97,18 @@ public class FingerprintCharacter implements FingerprintBaseCharacter, UpdateFin
     /**
      * 显示popuwindow
      *
-     * @param fragmentManager
+     * @param activity
      */
     @Override
-    public void show(FragmentManager fragmentManager) {
-        if (initCipher(getCipher(), getKeystoreAlias())) {
-            FingerprintAuthenticationDialogFragment fragment = FingerprintAuthenticationDialogFragment.newInstance();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                fragment.setCryptoObject(new FingerprintManager.CryptoObject(getCipher()));
-            }
-            fragment.setStage(
-                    FingerprintAuthenticationDialogFragment.Stage.FINGERPRINT);
-            fragment.setUpdateFingerprintCallback(this);
-            fragment.setCallback(this);
-            fragment.show(fragmentManager, getDialogTag());
+    public void show(FragmentActivity activity) {
+        Cipher cipher = getCipher();
+        BiometricPromptFactory factory;
+        if (initCipher(cipher, getKeystoreAlias())) {
+            factory = new BiometricPromptFactory(activity, cipher, FingerprintAuthenticationDialogFragment.Stage.FINGERPRINT, this, this);
         } else {
-            FingerprintAuthenticationDialogFragment fragment
-                    = new FingerprintAuthenticationDialogFragment();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                fragment.setCryptoObject(new FingerprintManager.CryptoObject(getCipher()));
-            }
-            fragment.setStage(
-                    FingerprintAuthenticationDialogFragment.Stage.NEW_FINGERPRINT_ENROLLED);
-            fragment.setUpdateFingerprintCallback(this);
-            fragment.setCallback(this);
-            fragment.show(fragmentManager, getDialogTag());
+            factory = new BiometricPromptFactory(activity, cipher, FingerprintAuthenticationDialogFragment.Stage.NEW_FINGERPRINT_ENROLLED, this, this);
         }
+        factory.execute(Build.VERSION.SDK_INT);
     }
 
     /**
@@ -198,7 +186,6 @@ public class FingerprintCharacter implements FingerprintBaseCharacter, UpdateFin
     }
 
 
-
     /**
      * 重新创建密钥后，再次输入密码，以便验证包含新密钥的指纹。
      */
@@ -208,9 +195,9 @@ public class FingerprintCharacter implements FingerprintBaseCharacter, UpdateFin
     }
 
     @Override
-    public void onFingerprintAuthenticatedSucceed(FingerprintManager.CryptoObject cryptoObject, boolean withFingerprint) {
+    public void onFingerprintAuthenticatedSucceed() {
         if (null != getFingerprintCallback()) {
-            getFingerprintCallback().onFingerprintAuthenticatedSucceed(cryptoObject, withFingerprint);
+            getFingerprintCallback().onFingerprintAuthenticatedSucceed();
         }
     }
 
