@@ -12,8 +12,8 @@
 
 # 项目截图
 
-<img src="/app/pic/finger_gif.gif" alt="图-1：ffmpeg_version" width="380px"></img>
-<img src="/app/pic/finger_pic_screen.jpg" alt="图-2：cmd" width="380px"></img>
+![image](https://github.com/yangfeng1994/Android-FingerprintVerify/blob/dev/app/pic/finger_gif.gif)
+<img src="/app/pic/finger_pic_screen.jpg" alt="图-2：finger_pic_screen" width="380px"></img>
 
 #### 导入方法
 
