@@ -10,7 +10,7 @@ import android.os.CancellationSignal;
 import com.yf.verify.callback.FingerprintAuthenticatedCallback;
 
 @TargetApi(Build.VERSION_CODES.P)
-public class BaseBiometricPrompt29 implements BaseBiometricPrompt {
+public class BaseBiometricPrompt29 extends BiometricPrompt.AuthenticationCallback implements BaseBiometricPrompt, DialogInterface.OnClickListener {
     private CancellationSignal mCancellationSignal;
     private BiometricPrompt mBiometricPrompt;
     private FragmentActivity activity;
@@ -20,54 +20,36 @@ public class BaseBiometricPrompt29 implements BaseBiometricPrompt {
         this.activity = activity;
         this.callback = callback;
         mCancellationSignal = new CancellationSignal();
-        mCancellationSignal.setOnCancelListener(new CancellationSignal.OnCancelListener() {
-            @Override
-            public void onCancel() {
-                if (null != callback) {
-                    callback.onFingerprintCancel();
-                }
-            }
-        });
         mBiometricPrompt = new BiometricPrompt.Builder(activity)
-                .setNegativeButton("取消", activity.getMainExecutor(), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (null != callback) {
-                            callback.onFingerprintCancel();
-                        }
-                    }
-                }).setTitle("指纹验证")
+                .setNegativeButton("取消", activity.getMainExecutor(), this).setTitle("指纹验证")
                 .build();
     }
 
     @Override
     public void show() {
-        mBiometricPrompt.authenticate(mCancellationSignal, activity.getMainExecutor(), new BiometricPrompt.AuthenticationCallback() {
-            @Override
-            public void onAuthenticationError(int errorCode, CharSequence errString) {
-                super.onAuthenticationError(errorCode, errString);
-            }
+        mBiometricPrompt.authenticate(mCancellationSignal, activity.getMainExecutor(),this);
+    }
 
-            @Override
-            public void onAuthenticationHelp(int helpCode, CharSequence helpString) {
-                super.onAuthenticationHelp(helpCode, helpString);
-            }
+    @Override
+    public void onAuthenticationSucceeded(BiometricPrompt.AuthenticationResult result) {
+        super.onAuthenticationSucceeded(result);
+        if (null != callback) {
+            callback.onFingerprintSucceed();
+        }
+    }
 
-            @Override
-            public void onAuthenticationSucceeded(BiometricPrompt.AuthenticationResult result) {
-                super.onAuthenticationSucceeded(result);
-                if (null != callback) {
-                    callback.onFingerprintSucceed();
-                }
-            }
+    @Override
+    public void onAuthenticationFailed() {
+        super.onAuthenticationFailed();
+        if (null != callback) {
+            callback.onFingerprintFailed();
+        }
+    }
 
-            @Override
-            public void onAuthenticationFailed() {
-                super.onAuthenticationFailed();
-                if (null != callback) {
-                    callback.onFingerprintFailed();
-                }
-            }
-        });
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+        if (null != callback) {
+            callback.onFingerprintCancel();
+        }
     }
 }

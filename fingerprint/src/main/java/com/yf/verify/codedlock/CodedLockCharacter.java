@@ -127,11 +127,11 @@ public class CodedLockCharacter implements CodedLockBaseCharacter {
      */
     @Override
     public void showAuthenticationScreen(Activity activity) {
-        // 创建确认凭据屏幕。您可以自定义标题和描述。或 todo 可优化，让其调到手机的密码验证界面
-        //如果您让它为空，我们将为您提供一个通用的
+        // 创建确认凭据屏幕。您可以自定义标题和描述。
+        //如果您让它为空，我们将为您提供一个通用的标题与描述
         //避免过多显示重新验证对话框 -- 您的应用应尝试先使用加密对象，如果超时到期，请使用 createConfirmDeviceCredentialIntent() 方法在您的应用内重新验证用户身份。
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Intent intent = mKeyguardManager.createConfirmDeviceCredentialIntent(null, null);
+            Intent intent = getKeyguardManager().createConfirmDeviceCredentialIntent(null, null);
             if (null != activity && null != intent) {
                 activity.startActivityForResult(intent, REQUEST_CODE_CONFIRM_DEVICE_CREDENTIALS);
             } else {
@@ -148,7 +148,7 @@ public class CodedLockCharacter implements CodedLockBaseCharacter {
 
     @Override
     public void onDestroy() {
-        mKeyguardManager = null;
+        setKeyguardManager(null);
     }
 
     @Override
@@ -156,12 +156,18 @@ public class CodedLockCharacter implements CodedLockBaseCharacter {
         if (requestCode == CodedLockCharacter.REQUEST_CODE_CONFIRM_DEVICE_CREDENTIALS) {
             if (resultCode == Activity.RESULT_OK) {
                 if (onValidate()) {
-                    getAuthenticationScreenCallBack().onCodedLockAuthenticationSucceed();
+                    if (null != getAuthenticationScreenCallBack()) {
+                        getAuthenticationScreenCallBack().onCodedLockAuthenticationSucceed();
+                    }
                 } else {
-                    getAuthenticationScreenCallBack().onCodedLockAuthenticationFailed();
+                    if (null != getAuthenticationScreenCallBack()) {
+                        getAuthenticationScreenCallBack().onCodedLockAuthenticationFailed();
+                    }
                 }
             } else {
-                getAuthenticationScreenCallBack().onCodedLockAuthenticationCancel();
+                if (null != getAuthenticationScreenCallBack()) {
+                    getAuthenticationScreenCallBack().onCodedLockAuthenticationCancel();
+                }
             }
         }
     }

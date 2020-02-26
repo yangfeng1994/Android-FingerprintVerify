@@ -25,7 +25,7 @@ public class BaseBiometricPrompt28 implements BaseBiometricPrompt {
     public void show() {
         if (null == mFingerprintManager) {
             if (null != fingerprintCallback) {
-                fingerprintCallback.noEnrolledFingerprints();
+                fingerprintCallback.onNoEnrolledFingerprints();
             }
             return;
         }

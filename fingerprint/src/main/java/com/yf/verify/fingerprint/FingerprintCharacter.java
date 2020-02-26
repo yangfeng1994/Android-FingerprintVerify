@@ -94,7 +94,7 @@ public class FingerprintCharacter implements FingerprintBaseCharacter {
         mFingerprintManager = getFingerprintManager(activity);
         if (!isFingerprintAuthAvailable()) {
             if (null != callback) {
-                callback.noEnrolledFingerprints();
+                callback.onNoEnrolledFingerprints();
             }
             return;
         }

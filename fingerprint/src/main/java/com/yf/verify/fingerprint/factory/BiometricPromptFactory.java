@@ -26,12 +26,11 @@ public class BiometricPromptFactory {
     public void execute(int version) {
         if (version >= Build.VERSION_CODES.P) {
             prompt = new BaseBiometricPrompt29(activity, fingerprintCallback);
-//            prompt = new BaseBiometricPrompt28(activity, cipher, mFingerprintManager, fingerprintCallback);
         } else if (version >= Build.VERSION_CODES.M) {
             prompt = new BaseBiometricPrompt28(activity, cipher, mFingerprintManager, fingerprintCallback);
         } else {
             if (null != fingerprintCallback) {
-                fingerprintCallback.noEnrolledFingerprints();
+                fingerprintCallback.onNonsupportFingerprint();
             }
             return;
         }

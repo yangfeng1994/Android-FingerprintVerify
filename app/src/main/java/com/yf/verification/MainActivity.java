@@ -54,6 +54,8 @@ public class MainActivity extends AppCompatActivity implements FingerprintAuthen
             public void onClick(View v) {
                 if (codedLockAuthenticatedCharacter.isKeyguardSecure()) {
                     codedLockAuthenticatedCharacter.onValidate();
+                } else {
+                    Toast.makeText(MainActivity.this, "没有设置密码锁", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -81,19 +83,33 @@ public class MainActivity extends AppCompatActivity implements FingerprintAuthen
         Toast.makeText(this, "指纹验证成功", Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * 指纹验证失败
+     */
     @Override
     public void onFingerprintFailed() {
-
+        Toast.makeText(this, "指纹验证失败", Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * 取消验证
+     */
     @Override
     public void onFingerprintCancel() {
+        Toast.makeText(this, "取消指纹验证", Toast.LENGTH_SHORT).show();
+    }
 
+    /**
+     * 没有录入指纹或者不支持指纹识别
+     */
+    @Override
+    public void onNoEnrolledFingerprints() {
+        Toast.makeText(this, "没有录入指纹锁", Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void noEnrolledFingerprints() {
-        Toast.makeText(this, "没有录入指纹锁", Toast.LENGTH_SHORT).show();
+    public void onNonsupportFingerprint() {
+        Toast.makeText(this, "不支持指纹识别", Toast.LENGTH_SHORT).show();
     }
 
     /**

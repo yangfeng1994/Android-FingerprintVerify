@@ -68,6 +68,7 @@ public class FingerprintBottomDialogFragment extends BaseDialog implements Finge
         mTVFingerprintCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                onFingerprintCancel();
                 dismiss();
             }
         });
@@ -123,9 +124,16 @@ public class FingerprintBottomDialogFragment extends BaseDialog implements Finge
     }
 
     @Override
-    public void noEnrolledFingerprints() {
+    public void onNoEnrolledFingerprints() {
         if (null != mFingerprintAuthenticatedCallback) {
-            mFingerprintAuthenticatedCallback.noEnrolledFingerprints();
+            mFingerprintAuthenticatedCallback.onNoEnrolledFingerprints();
+        }
+    }
+
+    @Override
+    public void onNonsupportFingerprint() {
+        if (null != mFingerprintAuthenticatedCallback) {
+            mFingerprintAuthenticatedCallback.onNonsupportFingerprint();
         }
     }
 }

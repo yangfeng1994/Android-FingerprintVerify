@@ -26,6 +26,11 @@ public interface FingerprintAuthenticatedCallback {
     /**
      * 没有录入指纹
      */
-    void noEnrolledFingerprints();
+    void onNoEnrolledFingerprints();
+
+    /**
+     * 不支持指纹识别
+     */
+    void onNonsupportFingerprint();
 
 }

@@ -64,14 +64,6 @@ public class FingerprintUiHelper extends FingerprintManagerCompat.Authentication
      */
     public void startListening(FingerprintManagerCompat.CryptoObject cryptoObject) {
         mCancellationSignal = new CancellationSignal();
-        mCancellationSignal.setOnCancelListener(new CancellationSignal.OnCancelListener() {
-            @Override
-            public void onCancel() {
-                if (null != mCallback) {
-                    mCallback.onFingerprintCancel();
-                }
-            }
-        });
         mSelfCancelled = false;
         mFingerprintManager
                 .authenticate(cryptoObject, 0, mCancellationSignal, this, null);
