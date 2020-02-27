@@ -17,8 +17,8 @@
 
 #### 导入方法
 
-1. 在项目的根目录下的 build.gradle中添加
-```
+##### 1. 在项目的根目录下的 build.gradle中添加
+```groovy
         allprojects {
 
    		repositories {
@@ -27,25 +27,25 @@
    		              }
 
             	}
-				```
-2. 在app下的 build.gradle中添加
 ```
+##### 2. 在app下的 build.gradle中添加
+```groovy
             dependencies {
 
 	        implementation 'com.github.yangfeng1994:Android-FingerprintVerify:1.0.3'
 
 	        }
-			```
-
-3. 千万不要忘记了这个可有可无，但又必须要加的权限
 ```
+
+##### 3. 千万不要忘记了这个权限，必须要加的权限
+```java
 <uses-permission android:name="android.permission.USE_BIOMETRIC" />
 ```
 #### 使用方法
 
 #  1. 如果你想使用密码锁验证
 ####  1. 初始化指纹验证
-```
+```java
      // 这个建造者模式，是阶级建造者模式，必须按照顺序可以。
 
       fingerprintAuthenticatedCharacter = FingerprintCharacterStepBuilder
@@ -57,8 +57,8 @@
        fingerprintAuthenticatedCharacter.show(Activity);//显示指纹验证的弹窗
 
 ```
-####  指纹验证回调
-```
+####  2.指纹验证回调
+```java
 
     /**
        * 指纹验证成功
@@ -100,8 +100,8 @@
 
 
 #  2. 可以进行手机自带密码锁的验证
-####部分方法介绍
-```
+##### 1.部分方法介绍
+```java
    1.   setActivity()设置activity 上下文对象，用来获取密码管理类
 
    2.   setKeystoreAlias("")    添加你应用的密码库的别名
@@ -124,10 +124,10 @@
 
    8. codedLockAuthenticatedCharacter.onValidate();进行密码验证
 
-      ```
-
-#### 初始化密码验证
 ```
+
+##### 2. 初始化密码验证
+```java
 codedLockAuthenticatedCharacter = CodedLockAuthenticatedStepBuilder
                     .newBuilder()
                     .setActivity(MainActivity.this)
@@ -141,8 +141,8 @@ codedLockAuthenticatedCharacter = CodedLockAuthenticatedStepBuilder
 
 
 
-####跳到密码验证界面，去验证密码
-```
+##### 3.跳到密码验证界面，去验证密码
+```java
 	 if (codedLockAuthenticatedCharacter.isKeyguardSecure()) {
       	codedLockAuthenticatedCharacter.onValidate();
        }else{
@@ -151,8 +151,8 @@ codedLockAuthenticatedCharacter = CodedLockAuthenticatedStepBuilder
 ```
 
 
-## 密码验证的回调
-```
+##### 4.密码验证的回调
+```java
 	/**
     密码验证activity跳转回传的结果
      * @param requestCode
@@ -189,10 +189,10 @@ codedLockAuthenticatedCharacter = CodedLockAuthenticatedStepBuilder
      }
 ```
 
-###项目如需混淆
-```
+### 项目如需混淆
+```text
 -keep class com.yf.verify.** {*;}
 
 ```
-###如有问题 请联系微信 yf2921
+### 如有问题 请联系微信 yf2921
 
