@@ -194,5 +194,5 @@ codedLockAuthenticatedCharacter = CodedLockAuthenticatedStepBuilder
 -keep class com.yf.verify.** {*;}
 
 ```
-### 如有问题 请联系微信 yf2921
+### 如有问题 请联系微信 yf996875
 
